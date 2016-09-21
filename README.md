@@ -1,5 +1,15 @@
 # docker-wordpress
 
+Start by setting required variables in the shell environment e.g. "MYSQL_ROOT_PASSWORD":
+
+```
+$ openssl rand 12 -base64
+$ export MYSQL_ROOT_PASSWORD=random-secret
+$ export WORDPRESS_DB_PASSWORD=random-secret
+$ export WORDPRESS_DB_NAME=some-db-name
+$ export WORDPRESS_DB_USER=some-db-user
+```
+
 ```
 $ docker-compose up -d
 ```
