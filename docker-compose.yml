@@ -7,8 +7,9 @@ services:
     ports:
       - 8080:80
     environment:
-      WORDPRESS_DB_USER: wp-admin
-      WORDPRESS_DB_PASSWORD: 1SoNUpP6AYPDaAm1
+      WORDPRESS_DB_USER: "${WORDPRESS_DB_USER}"
+      WORDPRESS_DB_PASSWORD: "${WORDPRESS_DB_PASSWORD}"
+      WORDPRESS_DB_NAME: "${WORDPRESS_DB_NAME}"
       WORDPRESS_DB_HOST: db
     depends_on:
       - db
@@ -18,7 +19,7 @@ services:
   db:
     image: mysql
     environment:
-      MYSQL_ROOT_PASSWORD: 32e+ytGTjzDJgK5v
-      MYSQL_DATABASE: wordpress
-      MYSQL_USER: wp-admin
-      MYSQL_PASSWORD: 1SoNUpP6AYPDaAm1
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_DATABASE: "${WORDPRESS_DB_NAME}"
+      MYSQL_USER: "${WORDPRESS_DB_USER}"
+      MYSQL_PASSWORD: "${WORDPRESS_DB_PASSWORD}"
