@@ -14,6 +14,17 @@ $ export WORDPRESS_DB_USER=some-db-user
 $ docker-compose up -d
 ```
 
+Check that both containers are up and running:
+
+```
+$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                  NAMES
+cf53b21038a2        wordpress           "/entrypoint.sh apach"   33 hours ago        Up 15 minutes       0.0.0.0:8080->80/tcp   dockerwordpress_wordpress_1
+7708ddf23960        mysql               "docker-entrypoint.sh"   33 hours ago        Up 15 minutes       3306/tcp               dockerwordpress_db_1
+```
+
+Using your preferred browser, connect to Wordpress typing "localhost:8080".
+
 ```
 $ docker-machine create -d virtualbox node-1
 $ docker-machine create -d virtualbox node-2
@@ -35,15 +46,17 @@ To add a manager to this swarm, run the following command:
     docker swarm join \
     --token SWMTKN-1-0xf2d1at1cjibi8yinh77vredwpzccx29ll9pljnfbjuo4he3m-1ehe39rc51q4afr9yx2ds718u \
     192.168.99.100:2377
+
+$ TOKEN = $(docker swarm join-token -q worker)
 ```
 
 ```
 $ eval $(docker-machine env node-2)
-$ docker swarm join --token SWMTKN-1-0xf2d1at1cjibi8yinh77vredwpzccx29ll9pljnfbjuo4he3m-0sr5gel42ygi6hqjxddwbgqwm $(docker-machine ip node-1)
+$ docker swarm join --token $TOKEN $(docker-machine ip node-1)
 This node joined a swarm as a worker.
 
 $ eval $(docker-machine env node-3)
-$ docker swarm join --token SWMTKN-1-0xf2d1at1cjibi8yinh77vredwpzccx29ll9pljnfbjuo4he3m-0sr5gel42ygi6hqjxddwbgqwm $(docker-machine ip node-1)
+$ docker swarm join --token $TOKEN $(docker-machine ip node-1)
 This node joined a swarm as a worker.
 ```
 
@@ -53,11 +66,12 @@ $ docker network create --driver overlay private
 ```
 
 ```
-$ docker service create --name db -e MYSQL_ROOT_PASSWORD=mysecret -e MYSQL_DATABASE=wordpress -e MYSQL_USER=wp-user -e MYSQL_PASSWORD=random-secret --network private mysql
+$ eval $(docker-machine env node-1)
+$ docker service create --name db -e MYSQL_ROOT_PASSWORD="${MYSQL_ROOT_PASSWORD}" -e MYSQL_DATABASE="${WORDPRESS_DB_NAME}" -e MYSQL_USER="${WORDPRESS_DB_USER}" -e MYSQL_PASSWORD="${WORDPRESS_DB_PASSWORD}" --network private mysql
 ```
 
 ```
-$ docker service create --name some-wordpress -e WORDPRESS_DB_HOST=db -e WORDPRESS_DB_USER=wp-user -e WORDPRESS_DB_PASSWORD=random-secret -p 8080:80 --network private wordpress
+$ docker service create --name some-wordpress -e WORDPRESS_DB_HOST=db -e WORDPRESS_DB_USER="${WORDPRESS_DB_USER}" -e WORDPRESS_DB_PASSWORD="${WORDPRESS_DB_PASSWORD}" -e WORDPRESS_DB_NAME="${WORDPRESS_DB_NAME}" -p 8080:80 --network private wordpress
 ```
 
 ```
